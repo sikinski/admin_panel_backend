@@ -2,10 +2,11 @@ package main
 
 import (
     "fmt"
+    "net/http"
     "database/sql"
     _ "github.com/go-sql-driver/mysql"
 	"github.com/gin-gonic/gin"
-	"crypto/sha256"	
+	"crypto/sha256"
 	
 )
 func myFunc(c *gin.Context) {
@@ -22,6 +23,8 @@ type userData struct {
 	FullName string `form:"fullname" binding:"required"`
 	Status string `form:"status" binding:"required"`
 }
+
+
 //Hash implements root.Hash
 type Hash struct{}
 
@@ -29,8 +32,23 @@ type LoginJSON struct {
     UserName string `form:"username" binding:"required"`
     Password string `form:"password" binding:"required"`
 }
+
+type TaskIT struct {
+    Name string `form:"name" binding:"required"`
+    Description string `form:"description" binding:"required"`
+    DateStart string `form:"dateStart" `
+    DateEnd string `form:"dateEnd" `
+}
+
+type PointsProject struct {
+	ProjectID int `form:"projectID" binding:"required"`
+    ActivePoint string `form:"active_points" binding:"required"`
+    EndedPoint string `form:"ended_points" binding:"required"`
+}
+
 func auth(c *gin.Context) {
 	var json LoginJSON
+	fmt.Println(json)
     c.Bind(&json)
 	
 	var verif userData = DBVerif(json.UserName, json.Password)
@@ -133,11 +151,29 @@ func hashPass(pass string) string {
 }
 // ___________________________________ / Hash ___________________________________
 
+// ___________________________________ IT Tasks ___________________________________
+
+func createTaskIT(c *gin.Context) {
+	var newTaskIt TaskIT
+	
+	err := c.Bind(&newTaskIt)
+
+	if err != nil {
+        return
+    }
+	
+    c.IndentedJSON(http.StatusCreated, newTaskIt)
+	c.IndentedJSON(http.StatusOK, newTaskIt)
+}
+
+// ___________________________________ / IT Tasks ___________________________________
+
+
 func main() {
     router := gin.Default()
 	router.Use(CORSMiddleware())
-	router.GET("/", myFunc)
 	router.POST("/auth", auth)
+	router.POST("/createTaskIT", createTaskIT)
 
     router.Run("localhost:8080")
 	
