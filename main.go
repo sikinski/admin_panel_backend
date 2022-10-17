@@ -84,7 +84,7 @@ func DBVerif(username string, pass string) userData{
 	fmt.Println(hashedPass)
 	// ____________ INIT DB ___________________
 
-	db, err := sql.Open("mysql", "root@root")
+	db, err := sql.Open("mysql", "root@toor")
 	fmt.Println(db)
 	if err != nil {
         fmt.Println(err.Error())
